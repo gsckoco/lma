@@ -1,8 +1,34 @@
 #include "cpuworkerthread.h"
+
+#include <iostream>
+#include <iterator>
+#include <sstream>
+#include <vector>
+
 #include "cpu.h"
 
 cpuWorkerThread::cpuWorkerThread() {
+}
 
+std::vector<uint8_t> readFile(std::ifstream *file) {
+    // Stop eating new lines in binary mode!!!
+    file->unsetf(std::ios::skipws);
+
+    // get its size:
+    std::streampos fileSize;
+
+    file->seekg(0, std::ios::end);
+    fileSize = file->tellg();
+    file->seekg(0, std::ios::beg);
+
+    // reserve capacity
+    std::vector<uint8_t> vec;
+    vec.reserve(fileSize);
+
+    // read the data:
+    vec.insert(vec.begin(), std::istream_iterator<uint8_t>(*file), std::istream_iterator<uint8_t>());
+
+    return vec;
 }
 
 void cpuWorkerThread::startExecution(OutputWindow *caller) {
@@ -10,15 +36,9 @@ void cpuWorkerThread::startExecution(OutputWindow *caller) {
 
     CPU *cpu = new CPU(caller);
 
-    uint8_t program[] = {
-        0x40, 0x0A, // LDA 10
-        0x88, 0x00, // OUT A
-        0x90, 0x0A, // OTC 0x0A newline
-        0x20, 0x01, // SUB 1
-        0x73, 0x02, // BRP 0x02
-        0x80, 0x7F  // OUT 0x75
-    };
-    cpu->loadIntoMemory(program, sizeof(program), 0x0000);
+    std::vector<uint8_t> program = readFile(caller->program);
+
+    cpu->loadIntoMemory(&program[0], sizeof(program), 0x0000);
     //cpu->loadIntoMemory(program2, sizeof(program2), 0x00FF);
     cpu->start();
 }

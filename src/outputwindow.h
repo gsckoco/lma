@@ -4,6 +4,8 @@
 #include <gtkmm.h>
 #include <string>
 #include <thread>
+#include <vector>
+#include <fstream>
 #include "cpu.h"
 #include "cpuworkerthread.h"
 
@@ -25,6 +27,7 @@ class OutputWindow {
     Gtk::TextView *outputText = nullptr;
     Gtk::TextView *instructionText = nullptr;
     Glib::RefPtr<Gtk::TextBuffer> *instructionBuffer, *outputBuffer = nullptr;
+    std::ifstream *program;
     OutputWindow();
     ~OutputWindow();
     void init();
