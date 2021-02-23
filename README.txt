@@ -23,4 +23,6 @@ XIndexedAbsolute 0xX6 -- Adds address of X register to an absolute address, 2 by
 YIndexedAbsolute 0xX7 -- Adds address of Y register to an absolute address, 2 bytes
 Registry         0xX8 -- Points to value of registry, 1 bytes
 
+Big Endian
+
 Proper README will come later
