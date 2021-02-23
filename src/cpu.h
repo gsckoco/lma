@@ -32,7 +32,7 @@ enum class addressingMode : uint8_t {
     Registry = 0x08
 };
 
-enum class addressingModeize : uint8_t {
+enum class addressingModeSize : uint8_t {
     NoBytes,
     SingleByte,
     DoubleByte
@@ -45,8 +45,8 @@ enum class registerAddresses : uint8_t {
 };
 
 void printByte(uint8_t input);
-addressingModeize getSizeFromAddressingMode(addressingMode mode);
-uint16_t getOperandData(uint8_t memory[], uint8_t instructionAddress, addressingModeize size);
+addressingModeSize getSizeFromAddressingMode(addressingMode mode);
+uint16_t getOperandData(uint8_t memory[], uint8_t instructionAddress, addressingModeSize size);
 
 class CPU {
    private:

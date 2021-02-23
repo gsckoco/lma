@@ -12,40 +12,32 @@ void printByte(uint8_t input) {
     std::cout << x << std::endl;
 }
 
-addressingModeize getSizeFromAddressingMode(addressingMode mode) {
+addressingModeSize getSizeFromAddressingMode(addressingMode mode) {
     switch (mode) {
         case addressingMode::Implied:
-            return addressingModeize::NoBytes;
-
+            return addressingModeSize::NoBytes;
+        default:
         case addressingMode::Immediate:
-            return addressingModeize::SingleByte;
         case addressingMode::ZeroPage:
-            return addressingModeize::SingleByte;
         case addressingMode::XIndexed:
-            return addressingModeize::SingleByte;
         case addressingMode::YIndexed:
-            return addressingModeize::SingleByte;
         case addressingMode::Registry:
-            return addressingModeize::SingleByte;
+            return addressingModeSize::SingleByte;
 
         case addressingMode::Absolute:
-            return addressingModeize::DoubleByte;
         case addressingMode::XIndexedAbsolute:
-            return addressingModeize::DoubleByte;
         case addressingMode::YIndexedAbsolute:
-            return addressingModeize::DoubleByte;
-        default:
-            return addressingModeize::SingleByte;
+            return addressingModeSize::DoubleByte;
     }
 }
 
-uint16_t getOperandData(uint8_t memory[], uint8_t instructionAddress, addressingModeize size) {
+uint16_t getOperandData(uint8_t memory[], uint8_t instructionAddress, addressingModeSize size) {
     switch (size) {
-        case addressingModeize::NoBytes:
+        case addressingModeSize::NoBytes:
             return 0;
-        case addressingModeize::SingleByte:
+        case addressingModeSize::SingleByte:
             return memory[instructionAddress + 1];
-        case addressingModeize::DoubleByte:
+        case addressingModeSize::DoubleByte:
             return (memory[instructionAddress + 1] << 8) + memory[instructionAddress + 2];
         default:
             return 0;
@@ -82,7 +74,7 @@ void CPU::fetch() {
     uint8_t opcode = (uint8_t)(MDR[0] >> 4);
     uint8_t addressMode = (uint8_t)(MDR[0] << 4) >> 4;
 
-    addressingModeize size = getSizeFromAddressingMode((addressingMode)addressMode);
+    addressingModeSize size = getSizeFromAddressingMode((addressingMode)addressMode);
 
     MDR[1] = getOperandData(RAM, MAR, size);
     PC += (uint16_t)size + 1;
