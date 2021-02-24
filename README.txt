@@ -8,6 +8,10 @@ BRZ x 0x6X -- Moves program counter to memory location x, if accumulator value i
 BRP x 0x7X -- Moves program counter to memory location x, if accumulator value is greater than 0
 OUT x 0x8X -- Outputs the value of x
 OTC x 0x9X -- Outputs the value of x as a character
+LDX x 0xAX -- Load x into X register
+LDY x 0xBX -- Load x into Y register
+INX   0xCX -- Increment X register
+INY   0xDX -- Increment Y register
 
 Register Aliases:
 A -- Accumulator

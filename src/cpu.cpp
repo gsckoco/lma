@@ -1,11 +1,11 @@
 #include "cpu.h"
 
-#include <iostream>
-#include <iomanip>
-#include <string>
 #include <fmt/core.h>
 #include <gtkmm.h>
 
+#include <iomanip>
+#include <iostream>
+#include <string>
 
 void printByte(uint8_t input) {
     std::bitset<8> x(input);
@@ -59,9 +59,11 @@ void CPU::OutputPrint(std::string input) {
     caller->print(MessageType::Output, input);
 }
 
-void CPU::loadIntoMemory(uint8_t memory[], int size, uint16_t startAddress) {
-    for (size_t i = 0; i < size; i++) {
-        RAM[startAddress + i] = memory[i];
+void CPU::loadIntoMemory(std::vector<uint8_t> input, uint16_t startAddress) {
+    uint16_t pointer = 0;
+    for (uint8_t byte : input) {
+        RAM[pointer + startAddress] = byte;
+        pointer++;
     }
 }
 
@@ -81,31 +83,38 @@ void CPU::fetch() {
 }
 
 std::string instructionName(opcode instruction) {
-    switch (instruction)
-    {
-    case opcode::HLT:
-        return "HLT";
-    case opcode::ADD:
-        return "ADD";
-    case opcode::SUB:
-        return "SUB";
-    case opcode::STA:
-        return "STA";
-    case opcode::LDA:
-        return "LDA";
-    case opcode::BRA:
-        return "BRA";
-    case opcode::BRZ:
-        return "BRZ";
-    case opcode::BRP:
-        return "BRP";
-    case opcode::OUT:
-        return "OUT";
-    case opcode::OTC:
-        return "OTC";
+    switch (instruction) {
+        case opcode::HLT:
+            return "HLT";
+        case opcode::ADD:
+            return "ADD";
+        case opcode::SUB:
+            return "SUB";
+        case opcode::STA:
+            return "STA";
+        case opcode::LDA:
+            return "LDA";
+        case opcode::BRA:
+            return "BRA";
+        case opcode::BRZ:
+            return "BRZ";
+        case opcode::BRP:
+            return "BRP";
+        case opcode::OUT:
+            return "OUT";
+        case opcode::OTC:
+            return "OTC";
+        case opcode::LDX:
+            return "LDX";
+        case opcode::LDY:
+            return "LDY";
+        case opcode::INX:
+            return "INX";
+        case opcode::INY:
+            return "INY";
 
-    default:
-        break;
+        default:
+            break;
     }
     return "";
 }
@@ -180,9 +189,9 @@ int CPU::execute() {
             if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
                 PC = MDR[1];
             } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
-                PC =  MDR[1] + XRG;
+                PC = MDR[1] + XRG;
             } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
-                PC =  MDR[1] + YRG;
+                PC = MDR[1] + YRG;
             }
             break;
         case opcode::BRZ:  // Goto address when accumulator == 0
@@ -190,9 +199,9 @@ int CPU::execute() {
                 if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
                     PC = MDR[1];
                 } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
-                    PC =  MDR[1] + XRG;
+                    PC = MDR[1] + XRG;
                 } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
-                    PC =  MDR[1] + YRG;
+                    PC = MDR[1] + YRG;
                 }
             }
             break;
@@ -201,45 +210,84 @@ int CPU::execute() {
                 if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
                     PC = MDR[1];
                 } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
-                    PC =  MDR[1] + XRG;
+                    PC = MDR[1] + XRG;
                 } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
-                    PC =  MDR[1] + YRG;
+                    PC = MDR[1] + YRG;
                 }
             }
             break;
         case opcode::OUT:
             if (addressMode == addressingMode::Immediate) {
-                OutputPrint( fmt::format("{}", (int)(MDR[1])) );
+                OutputPrint(fmt::format("{}", (int)(MDR[1])));
             } else if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
-                OutputPrint( fmt::format("{}", (int)RAM[MDR[1]]) );
+                OutputPrint(fmt::format("{}", (int)RAM[MDR[1]]));
             } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
-                OutputPrint( fmt::format("{}", (int)RAM[MDR[1] + XRG]) );
+                OutputPrint(fmt::format("{}", (int)RAM[MDR[1] + XRG]));
             } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
-                OutputPrint( fmt::format("{}", (int)RAM[MDR[1] + YRG]));
+                OutputPrint(fmt::format("{}", (int)RAM[MDR[1] + YRG]));
             } else if (addressMode == addressingMode::Registry) {
                 uint8_t *reg = getRegister((registerAddresses)MDR[1]);
-                OutputPrint( fmt::format("{}", (int)(*reg)) );
+                OutputPrint(fmt::format("{}", (int)(*reg)));
             }
             break;
         case opcode::OTC:
             if (addressMode == addressingMode::Immediate) {
-                OutputPrint( fmt::format("{}", (char)(MDR[1])) );
+                OutputPrint(fmt::format("{}", (char)(MDR[1])));
             } else if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
-                OutputPrint( fmt::format("{}", (char)RAM[MDR[1]]) );
+                OutputPrint(fmt::format("{}", (char)RAM[MDR[1]]));
             } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
-                OutputPrint( fmt::format("{}", (char)RAM[MDR[1] + XRG]) );
+                OutputPrint(fmt::format("{}", (char)RAM[MDR[1] + XRG]));
             } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
-                OutputPrint( fmt::format("{}", (char)RAM[MDR[1] + YRG]));
+                OutputPrint(fmt::format("{}", (char)RAM[MDR[1] + YRG]));
             } else if (addressMode == addressingMode::Registry) {
                 uint8_t *reg = getRegister((registerAddresses)MDR[1]);
-                OutputPrint( fmt::format("{}", (char)(*reg)) );
+                OutputPrint(fmt::format("{}", (char)(*reg)));
             }
+            break;
+        case opcode::LDX:
+            if (addressMode == addressingMode::Immediate) {
+                XRG = MDR[1];
+            } else if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
+                XRG = RAM[MDR[1]];
+            } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
+                XRG = RAM[MDR[1] + XRG];
+            } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
+                XRG = RAM[MDR[1] + YRG];
+            } else if (addressMode == addressingMode::Registry) {
+                uint8_t *reg = getRegister((registerAddresses)MDR[1]);
+                XRG = *reg;
+            }
+            break;
+        case opcode::LDY:
+            if (addressMode == addressingMode::Immediate) {
+                YRG = MDR[1];
+            } else if (addressMode == addressingMode::Absolute || addressMode == addressingMode::ZeroPage) {
+                YRG = RAM[MDR[1]];
+            } else if (addressMode == addressingMode::XIndexed || addressMode == addressingMode::XIndexedAbsolute) {
+                YRG = RAM[MDR[1] + XRG];
+            } else if (addressMode == addressingMode::YIndexed || addressMode == addressingMode::YIndexedAbsolute) {
+                YRG = RAM[MDR[1] + YRG];
+            } else if (addressMode == addressingMode::Registry) {
+                uint8_t *reg = getRegister((registerAddresses)MDR[1]);
+                YRG = *reg;
+            }
+            break;
+        case opcode::INX:
+            XRG += 1;
+            break;
+        case opcode::INY:
+            YRG += 1;
             break;
 
         default:
             return 0;
     }
     return 1;
+}
+
+void CPU::step() {
+    fetch();
+    execute();
 }
 
 int CPU::start() {

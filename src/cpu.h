@@ -17,7 +17,11 @@ enum class opcode : uint8_t {
     BRZ = 0x06,
     BRP = 0x07,
     OUT = 0x08,
-    OTC = 0x09
+    OTC = 0x09,
+    LDX = 0x0A,
+    LDY = 0x0B,
+    INX = 0x0C,
+    INY = 0x0D,
 };
 
 enum class addressingMode : uint8_t {
@@ -64,10 +68,11 @@ class CPU {
     ~CPU();
     void InstructionPrint(std::string input);
     void OutputPrint(std::string input);
-    void loadIntoMemory(uint8_t memory[], int size, uint16_t startAddress);
+    void loadIntoMemory(std::vector<uint8_t> input, uint16_t startAddress);
     void fetch();
     int execute();
     uint8_t* getRegister(registerAddresses registerAddress);
+    void step();
     int start();
 };
 

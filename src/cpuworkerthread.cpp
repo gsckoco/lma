@@ -38,7 +38,7 @@ void cpuWorkerThread::startExecution(OutputWindow *caller) {
 
     std::vector<uint8_t> program = readFile(caller->program);
 
-    cpu->loadIntoMemory(&program[0], sizeof(program), 0x0000);
+    cpu->loadIntoMemory(program, 0x0000);
     //cpu->loadIntoMemory(program2, sizeof(program2), 0x00FF);
     cpu->start();
 }
