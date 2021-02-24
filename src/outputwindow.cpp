@@ -44,8 +44,14 @@ void OutputWindow::init() {
     instructionFrame.add(*instructionText);
     instructionFrame.set_label("Instructions");
 
-    box.pack_start(outputFrame);
-    box.pack_end(instructionFrame);
+    Gtk::ScrolledWindow instructionsScrolledWindow;
+    instructionsScrolledWindow.add(instructionFrame);
+
+    Gtk::ScrolledWindow outputScrolledWindow;
+    outputScrolledWindow.add(outputFrame);
+
+    box.pack_start(outputScrolledWindow);
+    box.pack_end(instructionsScrolledWindow);
 
     box.show_all();
 
